@@ -1,29 +1,25 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
 const path = require("path");
+const PORT = process.env.PORT || 3000;
 
-http
-  .createServer(function (req, res) {
-    let filePath = "";
+const app = express();
 
-    if (req.url === "/") {
-      filePath = "./index.html";
-    } else if (req.url === "/about") {
-      filePath = "./about.html";
-    } else if (req.url === "/contact-me") {
-      filePath = "./contact-me.html";
-    } else {
-      filePath = "./404.html";
-    }
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, "about.html"));
+});
+app.get("/contact-me", (req, res) => {
+  res.sendFile(path.join(__dirname, "contact-me.html"));
+});
 
-    fs.readFile(filePath, (err, content) => {
-      if (err) {
-        res.writeHead(500);
-        res.end("Erro interno no servidor");
-      } else {
-        res.writeHead(200, { "content-type": "text/html" });
-        res.end(content);
-      }
-    });
-  })
-  .listen(8080);
+const unknownEndpoint = (request, response) => {
+  response.sendFile(path.join(__dirname, "404.html"));
+};
+
+app.use(unknownEndpoint);
+
+app.listen(PORT, () => {
+  console.log(`My first Express app - listening on PORT ${PORT}`);
+});
